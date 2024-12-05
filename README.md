@@ -6,5 +6,5 @@ The automated pipeline for the latter is currently being drafted and will be pos
 The bioinformatics analyses were performed on the Core Cluster of the Institut Français de Bioinformatique (IFB) (ANR-11-INBS-0013).
 Some of them required a lot of resources. 
 
-All the analyses were performed by the author on GitHub. 
+All the analyses were performed by me. 
 If you have any questions, please don't hesitate to contact me.
