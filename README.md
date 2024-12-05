@@ -1,4 +1,4 @@
-# ChIP_HA-Complexe
+# ChIP-Seq Dataset
 
 On this repository you will find a file called ‘Steps_commented.sh’ which contains all the commands used to analyse the ChIP-Seq data from Letkova et al (in prep).
 The automated pipeline for the latter is currently being drafted and will be posted in the course of the year.
