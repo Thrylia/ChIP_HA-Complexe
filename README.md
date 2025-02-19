@@ -8,3 +8,6 @@ Some of them required a lot of resources.
 
 All the analyses were performed by me. 
 If you have any questions, please don't hesitate to contact me.
+
+To help you understand, here is a simplified diagram of the different steps in the analysis and the time taken for each sample: 
+![Pipeline ChIP-Seq](https://github.com/user-attachments/assets/c0dd42a2-cc46-4ae0-b21d-3d34a08d6b41)
