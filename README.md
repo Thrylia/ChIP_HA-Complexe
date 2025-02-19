@@ -11,3 +11,4 @@ If you have any questions, please don't hesitate to contact me.
 
 To help you understand, here is a simplified diagram of the different steps in the analysis and the time taken for each sample: 
 ![Pipeline ChIP-Seq](https://github.com/user-attachments/assets/c0dd42a2-cc46-4ae0-b21d-3d34a08d6b41)
+Please note that some steps may not have been carried out as part of the article, but are shown on the graph because they were tried out in the laboratory.
