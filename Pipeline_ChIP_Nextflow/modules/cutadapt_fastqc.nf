@@ -12,18 +12,18 @@ nextflow.enable.dsl=2
 // Display help message
 if (params.help) {
     log.info """
-    Usage: nextflow run cutadapt_fastqc.nf --fastq_list <path> --adapter_file <path> [--length <int>] [--quality <int>] [--output <path>] [--output_qc <path>] [--help]
+    Usage: nextflow run cutadapt_fastqc.nf --fastq_list <path> --adapter_file <path> [--length <int>] [--quality <int>] [--output_cutadapt <path>] [--output_trimqc <path>] [--help]
 
     Required parameters:
     --fastq_list    Path to a file containing the path to the paired-end FASTQ files to be trimmed
     --adapter_file  Path to a file containing the Illumina adapter sequences (Fasta file)
 
     Optional parameters:
-    --length        Minimum length for the reads after trimming (default: 75)
-    --quality       Minimum quality score for the reads after trimming (default: 20)
-    --output        Output directory for the trimmed FASTQ files (default: ./02_Trimmed-reads)
-    --output_qc     Output directory for the FastQC reports (default: ./02_Trimmed-reads/FastQC_report)
-    --help          Show this help message
+    --length          Minimum length for the reads after trimming (default: 75)
+    --quality         Minimum quality score for the reads after trimming (default: 20)
+    --output_cutadapt Output directory for the trimmed FASTQ files (default: ./02_Trimmed-reads)
+    --output_trimqc   Output directory for the FastQC reports (default: ./02_Trimmed-reads/FastQC_report)
+    --help            Show this help message
     """
     exit 0
 }
@@ -39,8 +39,8 @@ if (!params.fastq_list) {
 // Pipeline default parameters
 params.length = params.get('length', 75)                                                                // Length minimum for the reads
 params.quality = params.get('quality', 20)                                                              // Quality minimum for the reads
-params.output = params.get('output', "${params.output_root}/02_Trimmed-reads")                          // Cutadapt Output directory
-params.output_qc = params.get('output_qc', "${params.output_root}/02_Trimmed-reads/FastQC_report")      // MultiQC Output directory
+params.output_cutadapt = params.get('output_cutadapt', "${params.output_root}/02_Trimmed-reads")                // Cutadapt output directory
+params.output_trimqc = params.get('output_trimqc', "${params.output_root}/02_Trimmed-reads/FastQC_report")      // MultiQC output directory
 
 // Cutadapt trimming
 process TRIM_READS {
@@ -52,15 +52,15 @@ process TRIM_READS {
 
     output:
         tuple val(replicate_id),
-        path("${params.output}/${replicate_id}_R1_trimmed.fastq.gz"),
-        path("${params.output}/${replicate_id}_R2_trimmed.fastq.gz") into trimmed_reads
+        path("${params.output_cutadapt}/${replicate_id}_R1_trimmed.fastq.gz"),
+        path("${params.output_cutadapt}/${replicate_id}_R2_trimmed.fastq.gz") into trimmed_reads
     
     script: 
     """
     cutadapt \\
         -a file:${adapter_file} -A file:${adapter_file} \\
-        -o ${params.output}/${replicate_id}_R1_trimmed.fastq.gz \\
-        -p ${params.output}/${replicate_id}_R2_trimmed.fastq.gz \\
+        -o ${params.output_cutadapt}/${replicate_id}_R1_trimmed.fastq.gz \\
+        -p ${params.output_cutadapt}/${replicate_id}_R2_trimmed.fastq.gz \\
         -j ${params.threads} \\
         --minimum-length ${params.length}:${params.length} \\
         -q ${params.quality} \\
@@ -78,12 +78,12 @@ process TRIM_QUALITY_CHECK {
         tuple val(replicate_id), path(reads1_trimmed), path(reads2_trimmed) from trimmed_reads
 
     output:
-        path "${params.output_qc}/data" into fastqc_reports
+        path "${params.output_trimqc}/data" into fastqc_reports
     
     script: 
     """
-    mkdir -p "${params.output_qc}/data"
-    fastqc -o "${params.output_qc}/data" -t ${params.threads} ${reads1_trimmed} ${reads2_trimmed}
+    mkdir -p "${params.output_trimqc}/data"
+    fastqc -o "${params.output_trimqc}/data" -t ${params.threads} ${reads1_trimmed} ${reads2_trimmed}
     """
  }
 
@@ -95,12 +95,12 @@ process TRIM_GROUP_QC {
         path fastqc_reports_dir from fastqc_reports           // FastQC reports
     
     output:
-        path "${params.output_qc}/multiqc_data"
-        path "${params.output_qc}/multiqc_report.html"
+        path "${params.output_trimqc}/multiqc_data"
+        path "${params.output_trimqc}/multiqc_report.html"
 
     script: 
     """
-    multiqc ${fastqc_reports_dir} -o "${params.output_qc}"
+    multiqc ${fastqc_reports_dir} -o "${params.output_trimqc}"
     """
 }
 

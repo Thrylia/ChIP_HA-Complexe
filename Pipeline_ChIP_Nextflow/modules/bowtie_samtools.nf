@@ -11,15 +11,15 @@ nextflow.enable.dsl=2
 // Display help message
 if (params.help) {
     log.info """
-    Usage: nextflow run bowtie.nf --input_dir <path> --genome <path> [--output_dir <path>]
+    Usage: nextflow run bowtie.nf --input_dir <path> --genome <path> [--output_bowtie <path>]
 
     Required parameters:
     --input_dir    Path to the input directory containing FASTQ files
     --genome       Path to the reference genome file
 
     Optional parameters:
-    --output_dir   Path to the output directory (default: ./03_Alignment)
-    --help         Show this help message
+    --output_bowtie Path to the output directory (default: ./03_Alignment)
+    --help          Show this help message
     """
     exit 0
 }
@@ -33,7 +33,7 @@ if (!params.genome) {
 }
 
 // Pipeline default parameters
-params.output_dir = params.get('output_dir', "${params.output_root}/03_Alignment")           // Bowtie2 Output directory
+params.output_bowtie = params.get('output_bowtie', "${params.output_root}/03_Alignment")           // Bowtie2 Output directory
 
 // Retrieve fastq files and group paired-end reads
 Channel
@@ -57,8 +57,8 @@ process ALIGN_AND_FILTER {
         tuple path(reads1), path(reads2), val(replicate_id) from fastq_pairs
 
     output:
-        path("${params.output_dir}/${replicate_id}.sort.bam"),
-        path("${params.output_dir}/${replicate_id}.raw.bam"),
+        path("${params.output_bowtie}/${replicate_id}.sort.bam"),
+        path("${params.output_bowtie}/${replicate_id}.raw.bam"),
         path("${params.genome}.index")   // The index path is output for the next run, if required
 
     script:

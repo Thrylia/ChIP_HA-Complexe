@@ -32,7 +32,7 @@ if (!params.black_regions) {
 }
 
 // Pipeline default parameters
-params.output = params.get('output', "${params.output_root}/05_Blacklisted-Regions-Removed")    // Output directory
+params.output_intersect_intersect = params.get('output_intersect', "${params.output_root}/05_Blacklisted-Regions-Removed")    // Output directory
 
 // Remove the ENCODE-blacklisted regions from the alignment + Sort
 process REMOVE_REGIONS {
@@ -43,7 +43,7 @@ process REMOVE_REGIONS {
         path black_regions = params.black_regions
 
     output:
-        path "${params.output}/${replicate_id}.sort.bam"
+        path "${params.output_intersect}/${replicate_id}.sort.bam"
     
     script:
     def replicate_id = bam_file.baseName.replaceFirst(/\.dedup\.bam$/, '')  // Get replicate ID
@@ -54,16 +54,16 @@ process REMOVE_REGIONS {
         -b ${black_regions} \\
         -v \\
         -sorted \\
-        > ${params.output}/${replicate_id}.bam
+        > ${params.output_intersect}/${replicate_id}.bam
 
     # Sort the new BAM file
     samtools sort \\
         -O BAM \\
-        -o ${params.output}/${replicate_id}.sort.bam \\
-        ${params.output}/${replicate_id}.bam
+        -o ${params.output_intersect}/${replicate_id}.sort.bam \\
+        ${params.output_intersect}/${replicate_id}.bam
 
     # Cleanup the temporary file
-    rm ${params.output}/${replicate_id}.bam
+    rm ${params.output_intersect}/${replicate_id}.bam
     """
 }
 

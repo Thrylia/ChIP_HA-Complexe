@@ -45,7 +45,7 @@ if (!(params.ref_point in ['center', 'TSS'])) {
 }
 
 // Define parameters with default values
-params.output = params.get('output', "${params.output_root}/10_Deeptools")
+params.params.output_deeptools = params.get('output_deeptools', "${params.output_root}/10_Deeptools")
 params.effective_size = params.get('effective_size', 2495461690)
 params.length_min = params.get('length_min', 80)
 params.length_max = params.get('length_max', 200)
@@ -66,14 +66,14 @@ process COVERAGE_NORM {
         path bam_file from bam_files
 
     output:
-        path "${params.output}/${sample_bw}" into bw_outputs
+        path "${params.output_deeptools}/${sample_bw}" into bw_outputs
 
     script:
     """
     def sample_bw = bam_file.baseName.replace('.merged.sort.bam', '.rpgc.bw')
     bamCoverage -b ${bam_file} \\
         --outFileFormat bigwig \\
-        --outFileName ${params.output}/${sample_bw} \\
+        --outFileName ${params.output_deeptools}/${sample_bw} \\
         --normalizeUsing RPGC \\
         --effectiveGenomeSize ${params.effective_size} \\
         --MNase \\
@@ -92,7 +92,7 @@ process MATRIX_COMPUTE {
         path bw_file from bw_outputs
 
     output:
-        path "${params.output}/${sample_id}.${regions_name}.rpgc.gz" into matrix_outputs
+        path "${params.output_deeptools}/${sample_id}.${regions_name}.rpgc.gz" into matrix_outputs
 
     script:
     """
@@ -108,7 +108,7 @@ process MATRIX_COMPUTE {
         --numberOfProcessors ${params.threads} \\
         --smartLabels \\
         --metagene \\
-        --outFileName ${params.output}/${sample_id}.${regions_name}.rpgc.gz
+        --outFileName ${params.output_deeptools}/${sample_id}.${regions_name}.rpgc.gz
     """
 }
 
@@ -120,7 +120,7 @@ process GENERATE_PLOT {
         path matrix_file from matrix_outputs
 
     output:
-        path "${params.output}/${sample_id}.profile.svg"
+        path "${params.output_deeptools}/${sample_id}.profile.svg"
 
     script:
     """
@@ -129,7 +129,7 @@ process GENERATE_PLOT {
     def sample_id = matrix_file.baseName.replace('.rpgc.gz', '')
     
     plotProfile -m ${matrix_file} \\
-        -o ${params.output}/${sample_id}.profile.svg \\
+        -o ${params.output_deeptools}/${sample_id}.profile.svg \\
         --plotFileFormat svg \\
         --perGroup \\
         --plotType lines \\

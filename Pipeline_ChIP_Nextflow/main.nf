@@ -1,33 +1,53 @@
 #!/usr/bin/env nextflow
 
-/*
- * Pipeline default parameters
- */
-params.greeting = "Holà mundo!"
+include { ALIGN_AND_FILTER } from "modules/bowtie_samtools.nf"
+include { TRIM_READS; TRIM_QUALITY_CHECK; TRIM_GROUP_QC } from "modules/cutadapt_fastqc.nf"
+include { COVERAGE_NORM; MATRIX_COMPUTE; GENERATE_PLOT } from "modules/deeptools.nf"
+include { GROUP_BAM; COUNT_READ_PAIRS; SUBSAMPLE_BAM; MERGE_BAM; SORT_BAM } from "modules/downsample_merge.nf"
+include { QUALITY_CHECK; GROUP_QC } from "modules/fastqc.nf"
+include { REMOVE_REGIONS; GET_STATS } from "modules/intersect_stats.nf"
+include { GET_BAM_FILES; PEAKS_CALLING; ANNOTATE_PEAKS } from "modules/macs_homer.nf"
+include { PICARD_MARKDUP } from "modules/picard_markduplicates.nf"
 
 
-/*
- * Command to print a chr in output.txt
- */
- process name {
-
-    //outputDir to use
-    publishDir 'results', mode: 'copy'
-
-    input: 
-        val greeting
-
-    output:
-        path 'output.txt'
-    
-    script: 
-    """
-    echo "$greeting" > output.txt
-    """
-
- }
-
-
+// Mandatory paramaters 
+if (!params.fastq_list) {
+    exit 1, "ERROR: --fastq_list must be specified"
+}
+if (!params.adapter_file) {
+    exit 1, "ERROR: --adapter_file must be specified"
+}
+if (!params.input_dir) {
+    exit 1, "ERROR: --input_dir must be specified"
+}
+if (!params.genome) {
+    exit 1, "ERROR: --genome must be specified"
+}
+if (!params.black_regions) {
+    exit 1, "ERROR: --black_regions must be specified"
+}
+// Outputs
+params.output_fastqc = params.get('output_fastqc', "${params.output_root}/01_FastQC-report/data")           // FastQC Output directory
+params.output_multiqc = params.get('out_multiqc', "${params.output_root}/01_FastQC-report")      // MultiQC Output directory                                                          // Quality minimum for the reads
+params.output_cutadapt = params.get('output_cutadapt', "${params.output_root}/02_Trimmed-reads")                          // Cutadapt Output directory
+params.output_trimqc = params.get('output_trimqc', "${params.output_root}/02_Trimmed-reads/FastQC_report")      // MultiQC Output directory
+params.output_bowtie = params.get('output_bowtie', "${params.output_root}/03_Alignment")           // Bowtie2 Output directory
+params.output_picard = params.get('output_picard', "${params.output_root}/04_Markduplicates")  // Output directory for processed files
+params.output_intersect = params.get('output_intersect', "${params.output_root}/05_Blacklisted-Regions-Removed")    // Output directory
+params.output_deeptools = params.get('output_deeptools', "${params.output_deeptools}/10_Deeptools")
+// Parameters for analyses
+// Cutadapt
+params.length = params.get('length', 75)                                                                // Length minimum for the reads
+params.quality = params.get('quality', 20)    
+// Deeptools
+params.effective_size = params.get('effective_size', 2495461690)
+params.length_min = params.get('length_min', 80)
+params.length_max = params.get('length_max', 200)
+params.smooth = params.get('smooth', 80)
+params.before = params.get('before', 1000)
+params.after = params.get('after', 1000)
+params.plot_labels = params.get('plot_labels', '')
+params.plot_title = params.get('plot_title', '')
  workflow {
     
     //get the variable value from the command line, create the option --greeting

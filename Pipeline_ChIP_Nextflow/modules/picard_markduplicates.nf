@@ -11,13 +11,13 @@ nextflow.enable.dsl=2
 // Display help message
 if (params.help) {
     log.info """
-    Usage: nextflow run script.nf --input_dir <path> [--output_dir <path>] [--help]
+    Usage: nextflow run script.nf --input_dir <path> [--output_picard <path>] [--help]
 
     Required parameters:
     --input_dir     Path to the directory containing sorted BAM files for duplication removal
 
     Optional parameters:
-    --output_dir    Output directory for the processed BAM files and metrics (default: ./04_Markduplicates)
+    --output_picard Output directory for the processed BAM files and metrics (default: ./04_Markduplicates)
     --help          Show this help message
     """
     exit 0
@@ -29,7 +29,7 @@ if (!params.input_dir) {
 }
 
 // Pipeline default parameters
-params.output_dir = params.get('output_dir', "${params.output_root}/04_Markduplicates")  // Output directory for processed files
+params.output_picard = params.get('output_picard', "${params.output_root}/04_Markduplicates")  // Output directory for processed files
 
 // Mark and remove duplicated reads from the sorted BAM file 
 process PICARD_MARKDUP {
@@ -39,18 +39,18 @@ process PICARD_MARKDUP {
         path bam_file
     
     output: 
-        path "${params.output_dir}/${bam_file.simpleName}.dedup.bam"
-        path "${params.output_dir}/${bam_file.simpleName}.metrics.txt"
+        path "${params.output_picard}/${bam_file.simpleName}.dedup.bam"
+        path "${params.output_picard}/${bam_file.simpleName}.metrics.txt"
 
     script:
     """
     picard MarkDuplicates \\
         --READ_NAME_REGEX null \\
         --INPUT ${bam_file} \\
-        --OUTPUT ${params.output_dir}/${bam_file.simpleName}.dedup.bam \\
+        --OUTPUT ${params.output_picard}/${bam_file.simpleName}.dedup.bam \\
         --REMOVE_DUPLICATES \\
         --REMOVE_SEQUENCING_DUPLICATES \\
-        --METRICS_FILE ${params.output_dir}/${bam_file.simpleName}.metrics.txt
+        --METRICS_FILE ${params.output_picard}/${bam_file.simpleName}.metrics.txt
     """
 }
 
