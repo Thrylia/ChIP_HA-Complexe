@@ -29,13 +29,16 @@ if (!params.gtf_file) {
 if (!params.black_regions) {
     exit 1, "ERROR: --black_regions must be specified"
 }
-//Deeptools, not included in the main. Too many regions to check, best to do it with the module directly
-// if (!params.check_regions) {
-//     exit 1, "ERROR: --check_regions must be specified"
-// }
-// if (!(params.ref_point in ['center', 'TSS'])) {
-//     exit 1, "ERROR: --ref_point must be 'center' or 'TSS'. Provided: ${params.ref_point}"
-// }
+// !!!!!! Deeptools, not included in the main. Too many regions to check, best to do it with the module directly !!!!!!
+/*
+if (!params.check_regions) {
+    exit 1, "ERROR: --check_regions must be specified"
+}
+if (!(params.ref_point in ['center', 'TSS'])) {
+    exit 1, "ERROR: --ref_point must be 'center' or 'TSS'. Provided: ${params.ref_point}"
+}
+*/
+// !!!!!! Deeptools, not included in the main. Too many regions to check, best to do it with the module directly !!!!!!
 
 // Outputs
 params.output_fastqc = params.get('output_fastqc', "${params.output_root}/01_FastQC-report/data")                   // FastQC Output directory
@@ -58,15 +61,20 @@ params.quality = params.get('quality', 20)                                      
 // MACS
 params.warning_file = params.get('warning_file', "${params.output_peak}/warnings.txt")      // Warning file name
 params.pe_mode = params.get('pe_mode', true)                                                // Data paired-end
+
+// !!!!!! Deeptools, not included in the main. Too many regions to check, best to do it with the module directly !!!!!!
 // Deeptools
-// params.effective_size = params.get('effective_size', 2495461690)                            // Genome effective size
-// params.length_min = params.get('length_min', 80)                                            // Minimum length reads
-// params.length_max = params.get('length_max', 200)                                           // Maximum length reads
-// params.smooth = params.get('smooth', 80)                                                    // Plot smoothing
-// params.before = params.get('before', 1000)                                                  // Bases before regions to plot
-// params.after = params.get('after', 1000)                                                    // Bases after regions to plot
-// params.plot_labels = params.get('plot_labels', '')                                          // Samples labels, plot legend
-// params.plot_title = params.get('plot_title', '')                                            // Plot title
+/*
+params.effective_size = params.get('effective_size', 2495461690)                            // Genome effective size
+params.length_min = params.get('length_min', 80)                                            // Minimum length reads
+params.length_max = params.get('length_max', 200)                                           // Maximum length reads
+params.smooth = params.get('smooth', 80)                                                    // Plot smoothing
+params.before = params.get('before', 1000)                                                  // Bases before regions to plot
+params.after = params.get('after', 1000)                                                    // Bases after regions to plot
+params.plot_labels = params.get('plot_labels', '')                                          // Samples labels, plot legend
+params.plot_title = params.get('plot_title', '')                                            // Plot title
+*/
+// !!!!!! Deeptools, not included in the main. Too many regions to check, best to do it with the module directly !!!!!!
 
  workflow {
     // Quality report of the raw reads
@@ -86,5 +94,5 @@ params.pe_mode = params.get('pe_mode', true)                                    
     // Align to genome
     ALIGN_AND_FILTER(trimmed_reads) 
     // Remove the PCR duplicates
-    
+
  }
