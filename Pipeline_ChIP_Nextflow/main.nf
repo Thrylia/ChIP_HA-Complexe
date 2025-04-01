@@ -69,20 +69,22 @@ params.pe_mode = params.get('pe_mode', true)                                    
 // params.plot_title = params.get('plot_title', '')                                            // Plot title
 
  workflow {
-    // FastQC, quality report of the raw reads
+    // Quality report of the raw reads
     fastqc_reports = QUALITY_CHECK(params.fastq_list)
-    fastqc_reports | GROUP_QC()
-    // Cutadapt, trimming
+    GROUP_QC(fastqc_reports)
+    // Trimming
     trimmed_reads = Channel.fromPath(params.fastq_list)
     | map { line -> 
         def fields = line.split('\t') 
         def replicate_id = fields[0].replaceAll(/_R1.fastq.gz$/, '') 
         tuple(replicate_id, file(fields[0]), file(fields[1])) 
     }
-    | TRIM_READS()
-    // FastQC, quality report of the trimmed reads
-    fastqc_reports = trimmed_reads | TRIM_QUALITY_CHECK()
-    fastqc_reports | TRIM_GROUP_QC()
-    // Bowtie, align to genome
-    ALIGN_AND_FILTER(trimmed_reads) // BUg, trimmed_reads = name, rep1, rep2 mais attend rep1, rep2, name
+    TRIM_READS(trimmed_reads)
+    // Quality report of the trimmed reads
+    fastqc_reports = TRIM_QUALITY_CHECK(trimmed_reads)
+    TRIM_GROUP_QC(fastqc_reports)
+    // Align to genome
+    ALIGN_AND_FILTER(trimmed_reads) 
+    // Remove the PCR duplicates
+    
  }

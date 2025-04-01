@@ -36,7 +36,9 @@ if (!params.genome) {
 params.output_bowtie = params.get('output_bowtie', "${params.output_root}/03_Alignment")           // Bowtie2 Output directory
 
 // Retrieve fastq files and group paired-end reads
-Channel
+// Channel
+// !!!!!! A CHANGER POUR QUE TUPLE = (name, R1, R2) !!!!!!
+/*
     .fromPath("${params.input_dir}/*.fastq.gz")
     .map { file -> 
         def match = file.name =~ /(.+)_R[12]_trimmed.fastq.gz/
@@ -48,13 +50,15 @@ Channel
     .filter { it != null }                      // Remove null entries
     .groupTuple()
     .set { fastq_pairs }
+*/
+// !!!!!! A CHANGER POUR QUE TUPLE = (name, R1, R2) !!!!!!
 
 // Bowtie2 Alignment process
 process ALIGN_AND_FILTER {
     tag "Aligning trimmed reads: ${replicate_id}"
 
     input:
-        tuple path(reads1), path(reads2), val(replicate_id) from fastq_pairs
+        tuple val(replicate_id), path(reads1), path(reads2) from fastq_pairs
 
     output:
         path("${params.output_bowtie}/${replicate_id}.sort.bam"),
