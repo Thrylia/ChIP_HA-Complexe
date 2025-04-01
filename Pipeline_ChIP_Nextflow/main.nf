@@ -1,10 +1,10 @@
 #!/usr/bin/env nextflow
 
+include { QUALITY_CHECK; GROUP_QC } from "modules/fastqc.nf"
 include { ALIGN_AND_FILTER } from "modules/bowtie_samtools.nf"
 include { TRIM_READS; TRIM_QUALITY_CHECK; TRIM_GROUP_QC } from "modules/cutadapt_fastqc.nf"
 include { COVERAGE_NORM; MATRIX_COMPUTE; GENERATE_PLOT } from "modules/deeptools.nf"
 include { GROUP_BAM; COUNT_READ_PAIRS; SUBSAMPLE_BAM; MERGE_BAM; SORT_BAM } from "modules/downsample_merge.nf"
-include { QUALITY_CHECK; GROUP_QC } from "modules/fastqc.nf"
 include { REMOVE_REGIONS; GET_STATS } from "modules/intersect_stats.nf"
 include { GET_BAM_FILES; PEAKS_CALLING; ANNOTATE_PEAKS } from "modules/macs_homer.nf"
 include { PICARD_MARKDUP } from "modules/picard_markduplicates.nf"
@@ -69,11 +69,20 @@ params.pe_mode = params.get('pe_mode', true)                                    
 // params.plot_title = params.get('plot_title', '')                                            // Plot title
 
  workflow {
-    
-    //get the variable value from the command line, create the option --greeting
-    greeting_ch = Channel.of(params.greeting)
-    
-    // launch the process defined above
-    name(greeting_ch)
-
+    // FastQC, quality report of the raw reads
+    fastqc_reports = QUALITY_CHECK(params.fastq_list)
+    fastqc_reports | GROUP_QC()
+    // Cutadapt, trimming
+    trimmed_reads = Channel.fromPath(params.fastq_list)
+    | map { line -> 
+        def fields = line.split('\t') 
+        def replicate_id = fields[0].replaceAll(/_R1.fastq.gz$/, '') 
+        tuple(replicate_id, file(fields[0]), file(fields[1])) 
+    }
+    | TRIM_READS()
+    // FastQC, quality report of the trimmed reads
+    fastqc_reports = trimmed_reads | TRIM_QUALITY_CHECK()
+    fastqc_reports | TRIM_GROUP_QC()
+    // Bowtie, align to genome
+    ALIGN_AND_FILTER(trimmed_reads) // BUg, trimmed_reads = name, rep1, rep2 mais attend rep1, rep2, name
  }
