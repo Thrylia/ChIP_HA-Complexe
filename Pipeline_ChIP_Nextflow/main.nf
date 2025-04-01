@@ -92,7 +92,20 @@ params.plot_title = params.get('plot_title', '')                                
     fastqc_reports = TRIM_QUALITY_CHECK(trimmed_reads)
     TRIM_GROUP_QC(fastqc_reports)
     // Align to genome
-    ALIGN_AND_FILTER(trimmed_reads) 
+    sorted_bam = ALIGN_AND_FILTER(trimmed_reads).out.filter { it.endsWith('.sort.bam') }
     // Remove the PCR duplicates
-
+    dedup_bam = PICARD_MARKDUP(sorted_bam).out.filter { it.endsWith('.dedup.bam') }
+    // Remove the black listed regions
+    white_bam = REMOVE_REGIONS(dedup_bam)
+    GET_STATS(white_bam)
+    // Downsamples
+    sorted_bam = GROUP_BAM(white_bam) | COUNT_READ_PAIRS() | SUBSAMPLE_BAM () | MERGE_BAM () | SORT_BAM()
+    // MACS
+    query_control_pairs = GET_BAM_FILES(params.output_merge)
+    query_control_pairs.view().each { pair ->
+        def bam_file_query = pair[0]
+        def bam_file_control = pair[1]
+        def prefix_out = bam_file_query.name.replace(".sort.bam", "")
+    narrowPeak_file = PEAKS_CALLING(bam_file_query, bam_file_control, params.pe_mode, prefix_out).filter { it.name == "${prefix_out}_peaks.narrowPeak.bed" }.first()
+    ANNOTATE_PEAKS(narrowPeak_file, prefix_out, params.genome_file, params.gtf_file)
  }
