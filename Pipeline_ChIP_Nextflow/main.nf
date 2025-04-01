@@ -106,6 +106,6 @@ params.plot_title = params.get('plot_title', '')                                
         def bam_file_query = pair[0]
         def bam_file_control = pair[1]
         def prefix_out = bam_file_query.name.replace(".sort.bam", "")
-    narrowPeak_file = PEAKS_CALLING(bam_file_query, bam_file_control, params.pe_mode, prefix_out).filter { it.name == "${prefix_out}_peaks.narrowPeak.bed" }.first()
+    narrowPeak_file = PEAKS_CALLING(bam_file_query, bam_file_control, params.pe_mode, prefix_out).out.filter { it.name == "${prefix_out}_peaks.narrowPeak.bed" }.first()
     ANNOTATE_PEAKS(narrowPeak_file, prefix_out, params.genome_file, params.gtf_file)
  }
