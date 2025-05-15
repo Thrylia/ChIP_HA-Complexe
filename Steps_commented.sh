@@ -202,3 +202,32 @@ plotProfile -m $name_output.$region_to_check.bw.gz \
     --samplesLabel Label1 Label2 Label3 ... \
     --legendLocation best \
     --plotTitle "Title"
+
+############################################################################
+# Supplementary data, log2ratio example
+bigwigCompare -b1 HA-CT20-WT.sort.bam.rpgc.bw \ 
+  -b2 H3-12-CT20-WT.sort.bam.rpgc.bw \ 
+  --operation log2 \ 
+  --pseudocount 1 \ 
+  -o log2_H3.3_vs_H3.12_CT20.bw
+
+computeMatrix reference-point \
+  -S log2_H3.3_vs_H3.12_CT8.bw log2_H3.3_vs_H3.12_CT20.bw \
+  -R Mus_musculus.GRCm39.112.genes.bed \
+  --beforeRegionStartLength 1000 \
+  --afterRegionStartLength 1000 \
+  --referencePoint TSS \
+  --smartLabels --metagene \
+  -o log2_H3.3_H3.12_CT8_vs_CT20.gz
+  
+plotProfile \
+  -m log2_H3.3_H3.12_CT8_vs_CT20.gz \
+  --perGroup \
+  --plotType lines \
+  --plotFileFormat svg \
+  --legendLocation best \
+  --outFileName log2_H3.3_H3.12_CT8_vs_CT20.profile.svg \
+  --outFileNameData log2_H3.3_H3.12_CT8_vs_CT20.profile.tab \
+  --colors blue red --plotHeight 7 --plotWidth 9 \
+  --samplesLabel "log2(H3.3/H3.1-2) CT8" "log2(H3.3/H3.1-2) CT20" \
+  --yMin 0.02 --yMax 0.27
