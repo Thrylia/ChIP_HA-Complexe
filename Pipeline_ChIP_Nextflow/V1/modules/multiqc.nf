@@ -3,6 +3,7 @@
 
 /*
     Launch MultiQC report for a folder including FastQC reports
+    conda create -n multiqc_env python=3.10 multiqc=1.14 numpy=1.23
 */
 
 process reportMultiqc {
