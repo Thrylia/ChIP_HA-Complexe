@@ -13,8 +13,7 @@ process bowtieIndex {
         val batch
 
     output:
-        path "${batch}/genome_index.*.bt2"
-        path "${batch}", emit: indexDir
+        path "${batch}", emit: bowtieIndexDir
 
     script:
     """
@@ -28,21 +27,17 @@ process bowtieAlign {
     publishDir 'results', mode: 'copy'
     
     input: 
-        path trimDir
-        path genomeIndex
+        tuple val (name), path (r1), path (r2)
+        path bowtieIndexDir
         val threads
         val batch
 
     output:
-        path "${batch}_bowtieAlign/*", emit : bowtieDir
-        path "${batch}_bowtieAlign/*/*sam"
+        tuple val (name), path ("${batch}_4-bowtieAlign/${name}/${name}.sam"), emit : bowtieAligned
 
     script:
     """
-    name=\$(basename ${trimDir})
-    r1=\$(find -L "${trimDir}" -type f -name "*R1*.fastq*" | sort | head -n 1)
-    r2=\$(find -L "${trimDir}" -type f -name "*R2*.fastq*" | sort | head -n 1)
-    mkdir -p ${batch}_bowtieAlign/\${name}
+    mkdir -p ${batch}_4-bowtieAlign/${name}
     bowtie2 \\
         -p $threads  \\
         --very-sensitive \\
@@ -50,8 +45,8 @@ process bowtieAlign {
         --no-mixed \\
         --no-discordant \\
         --dovetail \\
-        -x ${genomeIndex}/genome_index \\
-        -1 \$r1 -2 \$r2 \\
-        -S ${batch}_bowtieAlign/\${name}/\${name}.sam
+        -x ${bowtieIndexDir}/genome_index \\
+        -1 $r1 -2 $r2 \\
+        -S ${batch}_4-bowtieAlign/${name}/${name}.sam
     """
 }

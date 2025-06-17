@@ -18,16 +18,16 @@ process cutadaptTrim {
         val quality
 
     output:
-        path "${batch}_cutadaptTrim/${name}", emit : cutadaptDir
-        path "${batch}_cutadaptTrim/${name}/TRIM_*.fastq.gz"
+    tuple val(name), path("${batch}_2-cutadaptTrim/${name}/TRIM_${r1}"), path("${batch}_2-cutadaptTrim/${name}/TRIM_${r2}"), emit: cutadaptTup
+    path "${batch}_2-cutadaptTrim/${name}/TRIM_*.fastq.gz"
 
     script:
     """
-    mkdir -p ${batch}_cutadaptTrim/${name}
+    mkdir -p ${batch}_2-cutadaptTrim/${name}
     conda run -n cutadaptenv cutadapt \\
         -a file:${adapter_file} -A file:${adapter_file} \\
-        -o ${batch}_cutadaptTrim/${name}/TRIM_${r1} \\
-        -p ${batch}_cutadaptTrim/${name}/TRIM_${r2} \\
+        -o ${batch}_2-cutadaptTrim/${name}/TRIM_${r1} \\
+        -p ${batch}_2-cutadaptTrim/${name}/TRIM_${r2} \\
         -j ${threads} \\
         --minimum-length ${length}:${length} \\
         -q ${quality} \\

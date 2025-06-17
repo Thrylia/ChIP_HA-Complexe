@@ -14,11 +14,11 @@ process reportRawMultiqc {
         val batch
 
     output:
-        path "${batch}_rawReports/multiqc_report.html"
+        path "${batch}_1-rawReports/multiqc_report.html"
 
     script:
     """
-    conda run -n multiqc_env multiqc ${fastqcDirs} -o ${batch}_rawReports
+    conda run -n multiqc_env multiqc ${fastqcDirs} -o ${batch}_1-rawReports
     """
 }
 
@@ -30,10 +30,10 @@ process reportTrimMultiqc {
         val batch
 
     output:
-        path "${batch}_trimReports/multiqc_report.html"
+        path "${batch}_3-trimReports/multiqc_report.html"
 
     script:
     """
-    conda run -n multiqc_env multiqc ${fastqcDirs} -o ${batch}_trimReports
+    conda run -n multiqc_env multiqc ${fastqcDirs} -o ${batch}_3-trimReports
     """
 }
