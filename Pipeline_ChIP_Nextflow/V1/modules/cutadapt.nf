@@ -10,7 +10,7 @@ process cutadaptTrim {
     publishDir 'results', mode: 'copy'
     
     input:
-        tuple path (R1), path (R2)
+        tuple val (name), path (r1), path (r2)
         path adapter_file
         val batch
         val threads
@@ -18,21 +18,21 @@ process cutadaptTrim {
         val quality
 
     output:
-        path "${batch}_cutadaptTrim", emit : folderOut
-        path "${batch}_cutadaptTrim/TRIM_*.fastq.gz"
+        path "${batch}_cutadaptTrim/${name}", emit : cutadaptDir
+        path "${batch}_cutadaptTrim/${name}/TRIM_*.fastq.gz"
 
     script:
     """
-    mkdir ${batch}_cutadaptTrim
+    mkdir -p ${batch}_cutadaptTrim/${name}
     conda run -n cutadaptenv cutadapt \\
         -a file:${adapter_file} -A file:${adapter_file} \\
-        -o ${batch}_cutadaptTrim/TRIM_${R1} \\
-        -p ${batch}_cutadaptTrim/TRIM_${R2} \\
+        -o ${batch}_cutadaptTrim/${name}/TRIM_${r1} \\
+        -p ${batch}_cutadaptTrim/${name}/TRIM_${r2} \\
         -j ${threads} \\
         --minimum-length ${length}:${length} \\
         -q ${quality} \\
         --pair-filter=any \\
         --quality-base=33 \\
-        ${R1} ${R2}
+        ${r1} ${r2}
     """
 }

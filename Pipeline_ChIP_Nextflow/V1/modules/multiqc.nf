@@ -6,18 +6,34 @@
     conda create -n multiqc_env python=3.10 multiqc=1.14 numpy=1.23
 */
 
-process reportMultiqc {
+process reportRawMultiqc {
     publishDir 'results', mode: 'copy'
     
     input:
-        path fastqcReportFolder
+        path fastqcDirs
         val batch
 
     output:
-        path "${batch}_multiqcReport/multiqc_report.html"
+        path "${batch}_rawReports/multiqc_report.html"
 
     script:
     """
-    conda run -n multiqc_env multiqc ${fastqcReportFolder} -o ${batch}_multiqcReport
+    conda run -n multiqc_env multiqc ${fastqcDirs} -o ${batch}_rawReports
+    """
+}
+
+process reportTrimMultiqc {
+    publishDir 'results', mode: 'copy'
+    
+    input:
+        path fastqcDirs
+        val batch
+
+    output:
+        path "${batch}_trimReports/multiqc_report.html"
+
+    script:
+    """
+    conda run -n multiqc_env multiqc ${fastqcDirs} -o ${batch}_trimReports
     """
 }

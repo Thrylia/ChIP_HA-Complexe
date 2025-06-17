@@ -1,2 +1,2 @@
-./data/HA-CT0-WT-Rep1_R1.head100.fastq.gz	./data/HA-CT0-WT-Rep1_R2.head100.fastq.gz
-./data/HA-CT0-WT-Rep2_R1.head100.fastq.gz	./data/HA-CT0-WT-Rep2_R2.head100.fastq.gz
+HA-CT0-WT-Rep1	./data/HA-CT0-WT-Rep1_R1.head100.fastq.gz	./data/HA-CT0-WT-Rep1_R2.head100.fastq.gz
+HA-CT0-WT-Rep2	./data/HA-CT0-WT-Rep2_R1.head100.fastq.gz	./data/HA-CT0-WT-Rep2_R2.head100.fastq.gz
