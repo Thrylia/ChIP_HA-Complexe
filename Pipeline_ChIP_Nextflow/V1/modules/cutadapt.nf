@@ -7,7 +7,6 @@
 */
 
 process cutadaptTrim {
-    publishDir 'results', mode: 'copy'
     
     input:
         tuple val (name), path (r1), path (r2)

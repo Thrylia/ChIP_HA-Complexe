@@ -7,7 +7,6 @@
 */
 
 process reportRawMultiqc {
-    publishDir 'results', mode: 'copy'
     
     input:
         path fastqcDirs
@@ -23,7 +22,6 @@ process reportRawMultiqc {
 }
 
 process reportTrimMultiqc {
-    publishDir 'results', mode: 'copy'
     
     input:
         path fastqcDirs

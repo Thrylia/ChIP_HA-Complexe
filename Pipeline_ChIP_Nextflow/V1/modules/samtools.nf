@@ -6,7 +6,6 @@
 */
 
 process samtoolsFilter {
-    publishDir 'results', mode: 'copy'
 
     input:
         tuple val (name), path (rawSam)

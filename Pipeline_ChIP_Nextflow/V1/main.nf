@@ -7,9 +7,12 @@ include { cutadaptTrim } from "./modules/cutadapt.nf"
 include { bowtieIndex; bowtieAlign } from "./modules/bowtie.nf"
 include { samtoolsFilter; samtoolsSubset } from "./modules/samtools.nf"
 include { picardValidate; picardReplace; picardDuplicates } from "./modules/picard.nf"
-
+include { bedtoolsBlackListed } from "./modules/bedtools.nf"
 
 workflow {
+
+    main:
+    
     // Raw samples, tuple(name, r1, r2)
     samples_ch = Channel.fromPath(params.samples)
                         .splitCsv(sep: '\t')
@@ -43,8 +46,12 @@ workflow {
     // Picard Validate
     picardValidate(samtoolsFilter.out.bamSorted, params.genome_fasta, params.batch) 
     // If not validated
-    picardReplace(picardValidate.out.validateFile, samtoolsFilter.out.bamSorted, params.batch)
+    // presence of a small pirouette, forcing picard to be true. To be modified in V2
+    picardReplace(picardValidate.out.validateFile, samtoolsFilter.out.bamSorted, params.batch) 
 
     // Picard no Duplicates
-   picardDuplicates(picardReplace.out.validateBam, params.batch)
+    picardDuplicates(picardReplace.out.validateBam, params.batch)
+
+    // Bedtools, no black listed regions
+    bedtoolsBlackListed(picardDuplicates.out.noDupBam, params.blacklisted_regions, params.batch)
 }

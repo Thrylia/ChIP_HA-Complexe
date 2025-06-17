@@ -13,7 +13,6 @@
 process picardValidate {
     //errorStrategy 'ignore'
 
-    publishDir 'results', mode: 'copy'
 
     input:
         tuple val (name), path (sortBam)
@@ -35,7 +34,6 @@ process picardValidate {
 }
 
 process picardReplace {
-    publishDir 'results', mode: 'copy'
     
     input:
         tuple val (name), path (validateFile)
@@ -70,7 +68,6 @@ process picardReplace {
 }
 
 process picardDuplicates {
-    publishDir 'results', mode: 'copy'
 
     input:
         tuple val (name), path (validateBam)

@@ -6,7 +6,6 @@
 */
 
 process reportRawFastqc {
-    publishDir 'results', mode: 'copy'
     
     input:
         tuple val (name), path (r1), path (r2)
@@ -25,7 +24,6 @@ process reportRawFastqc {
 }
 
 process reportTrimFastqc {
-    publishDir 'results', mode: 'copy'
     
     input:
         tuple val (name), path (r1), path (r2)
