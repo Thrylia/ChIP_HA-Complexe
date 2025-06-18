@@ -1,6 +1,8 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
+//nextflow run main.nf -resume -profile docker,test
+
 include { reportRawFastqc; reportTrimFastqc } from "./modules/fastqc.nf"
 include { reportRawMultiqc; reportTrimMultiqc } from "./modules/multiqc.nf"
 include { cutadaptTrim } from "./modules/cutadapt.nf"
@@ -12,7 +14,7 @@ include { bedtoolsBlackListed } from "./modules/bedtools.nf"
 workflow {
 
     main:
-    
+
     // Raw samples, tuple(name, r1, r2)
     samples_ch = Channel.fromPath(params.samples)
                         .splitCsv(sep: '\t')
