@@ -6,6 +6,7 @@
 */
 
 process bowtieIndex {
+    label 'bowtie'
     publishDir 'data', mode: 'copy'
 
     input:
@@ -24,6 +25,8 @@ process bowtieIndex {
 
 
 process bowtieAlign {
+    label 'bowtie'
+    
     input: 
         tuple val (name), path (r1), path (r2)
         path bowtieIndexDir

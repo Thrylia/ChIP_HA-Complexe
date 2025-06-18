@@ -5,6 +5,8 @@
 */
 
 process bedtoolsBlackListed {
+    label 'bedtools'
+
     input:
         tuple val (name), path (bamSorted)
         path blackListedRegions

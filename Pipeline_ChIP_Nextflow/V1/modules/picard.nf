@@ -12,6 +12,7 @@
 
 process picardValidate {
     //errorStrategy 'ignore'
+    label 'picard'
 
     input:
         tuple val (name), path (sortBam)
@@ -34,6 +35,8 @@ process picardValidate {
 }
 
 process picardReplace {
+    label 'picard'
+
     input:
         tuple val (name), path (validateFile)
         tuple val (nameBam), path (sortBam)
@@ -67,6 +70,8 @@ process picardReplace {
 }
 
 process picardDuplicates {
+    label 'picard'
+
     publishDir "results/${batch}_7-noDuplicates/${name}", mode: 'copy'
 
     input:
@@ -87,3 +92,4 @@ process picardDuplicates {
         --METRICS_FILE ${name}.picstats 
     """
 }
+

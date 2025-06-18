@@ -7,6 +7,8 @@
 */
 
 process cutadaptTrim {
+    label 'cutadapt'
+
     input:
         tuple val (name), path (r1), path (r2)
         path adapter_file

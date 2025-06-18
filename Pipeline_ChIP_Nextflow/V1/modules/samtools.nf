@@ -6,6 +6,8 @@
 */
 
 process samtoolsFilter {
+    label 'samtools'
+
     input:
         tuple val (name), path (rawSam)
         val batch
@@ -30,6 +32,8 @@ process samtoolsFilter {
 }
 
 process samtoolsSort {
+    label 'samtools'
+    
     publishDir "results/${batch}_7-noDuplicates/${name}", mode: 'copy'
     
     input:
@@ -48,7 +52,9 @@ process samtoolsSort {
     """
 }
 
-process samtoolsSortWhite {    
+process samtoolsSortWhite {   
+    label 'samtools'
+     
     input:
         tuple val (name), path (bamUnsorted)
         val batch
@@ -67,6 +73,8 @@ process samtoolsSortWhite {
 }
 
 process samtoolsSubset { 
+    label 'samtools'
+    
     input:
         path filteredBamDir
         val batch

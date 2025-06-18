@@ -7,6 +7,8 @@
 */
 
 process reportRawMultiqc {
+    label 'multiqc'
+
     input:
         path fastqcDirs
         val batch
@@ -21,6 +23,8 @@ process reportRawMultiqc {
 }
 
 process reportTrimMultiqc {
+    label 'multiqc'
+    
     input:
         path fastqcDirs
         val batch
@@ -33,3 +37,4 @@ process reportTrimMultiqc {
     multiqc ${fastqcDirs} -o ${batch}_3-trimReports
     """
 }
+
