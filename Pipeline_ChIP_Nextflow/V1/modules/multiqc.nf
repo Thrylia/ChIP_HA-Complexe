@@ -7,7 +7,6 @@
 */
 
 process reportRawMultiqc {
-    
     input:
         path fastqcDirs
         val batch
@@ -17,12 +16,11 @@ process reportRawMultiqc {
 
     script:
     """
-    conda run -n multiqc_env multiqc ${fastqcDirs} -o ${batch}_1-rawReports
+    multiqc ${fastqcDirs} -o ${batch}_1-rawReports
     """
 }
 
 process reportTrimMultiqc {
-    
     input:
         path fastqcDirs
         val batch
@@ -32,6 +30,6 @@ process reportTrimMultiqc {
 
     script:
     """
-    conda run -n multiqc_env multiqc ${fastqcDirs} -o ${batch}_3-trimReports
+    multiqc ${fastqcDirs} -o ${batch}_3-trimReports
     """
 }

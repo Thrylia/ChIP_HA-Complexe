@@ -5,7 +5,7 @@ include { reportRawFastqc; reportTrimFastqc } from "./modules/fastqc.nf"
 include { reportRawMultiqc; reportTrimMultiqc } from "./modules/multiqc.nf"
 include { cutadaptTrim } from "./modules/cutadapt.nf"
 include { bowtieIndex; bowtieAlign } from "./modules/bowtie.nf"
-include { samtoolsFilter; samtoolsSubset } from "./modules/samtools.nf"
+include { samtoolsFilter; samtoolsSubset; samtoolsSort; samtoolsSortWhite } from "./modules/samtools.nf"
 include { picardValidate; picardReplace; picardDuplicates } from "./modules/picard.nf"
 include { bedtoolsBlackListed } from "./modules/bedtools.nf"
 
@@ -51,7 +51,9 @@ workflow {
 
     // Picard no Duplicates
     picardDuplicates(picardReplace.out.validateBam, params.batch)
+    samtoolsSort(picardDuplicates.out.noDupBam, params.batch)
 
     // Bedtools, no black listed regions
-    bedtoolsBlackListed(picardDuplicates.out.noDupBam, params.blacklisted_regions, params.batch)
+    bedtoolsBlackListed(samtoolsSort.out.noDupSortBam, params.blacklisted_regions, params.batch)
+    samtoolsSortWhite(bedtoolsBlackListed.out.bamWhite, params.batch)
 }

@@ -2,12 +2,11 @@
 
 
 /*
-    Run Cutadapt on the illumina.fastq.gz
+    Run Cutadapt on the illumina.fastq
     conda create -n cutadaptenv -c bioconda cutadapt=2.6
 */
 
 process cutadaptTrim {
-    
     input:
         tuple val (name), path (r1), path (r2)
         path adapter_file
@@ -18,12 +17,12 @@ process cutadaptTrim {
 
     output:
     tuple val(name), path("${batch}_2-cutadaptTrim/${name}/TRIM_${r1}"), path("${batch}_2-cutadaptTrim/${name}/TRIM_${r2}"), emit: cutadaptTup
-    path "${batch}_2-cutadaptTrim/${name}/TRIM_*.fastq.gz"
+    path "${batch}_2-cutadaptTrim/${name}/TRIM_*.fastq"
 
     script:
     """
     mkdir -p ${batch}_2-cutadaptTrim/${name}
-    conda run -n cutadaptenv cutadapt \\
+    cutadapt \\
         -a file:${adapter_file} -A file:${adapter_file} \\
         -o ${batch}_2-cutadaptTrim/${name}/TRIM_${r1} \\
         -p ${batch}_2-cutadaptTrim/${name}/TRIM_${r2} \\

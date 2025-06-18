@@ -13,7 +13,6 @@
 process picardValidate {
     //errorStrategy 'ignore'
 
-
     input:
         tuple val (name), path (sortBam)
         path genomeFasta
@@ -25,7 +24,8 @@ process picardValidate {
     script:
     """
     mkdir -p ${batch}_6-checkBam/${name}
-    java -jar ~/Softwares/picard/build/libs/picard.jar ValidateSamFile \\
+    echo "Container: \$(cat /etc/os-release || echo unknown)"
+    java -jar /usr/picard/picard.jar ValidateSamFile \\
         -I ${sortBam} \\
         -M SUMMARY \\
         -O ${batch}_6-checkBam/${name}/${name}.sort.bam.validate \\
@@ -34,7 +34,6 @@ process picardValidate {
 }
 
 process picardReplace {
-    
     input:
         tuple val (name), path (validateFile)
         tuple val (nameBam), path (sortBam)
@@ -49,7 +48,7 @@ process picardReplace {
     mkdir -p ${batch}_5-filteredAlign/${nameBam}
     if [[ \$(cat ${validateFile} | grep "ERROR:MISSING_READ_GROUP") ]]; then
         echo "Validation report exists, proceeding with AddOrReplaceReadGroups"
-        java -jar ~/Softwares/picard/build/libs/picard.jar AddOrReplaceReadGroups \\
+        java -jar /usr/picard/picard.jar AddOrReplaceReadGroups \\
             -I ${sortBam} \\
             -O ${batch}_5-filteredAlign/${nameBam}/${nameBam}.tmp.bam \\
             -RGLB lib2024 \\
@@ -68,26 +67,23 @@ process picardReplace {
 }
 
 process picardDuplicates {
+    publishDir "results/${batch}_7-noDuplicates/${name}", mode: 'copy'
 
     input:
         tuple val (name), path (validateBam)
         val batch
 
     output:
-        tuple val (name), path ("${batch}_7-noDuplicates/${name}/${name}.sort.bam"), emit: noDupBam
-        path "${batch}_7-noDuplicates/${name}/${name}.picstats"
+        tuple val (name), path ("${name}.bam"), emit: noDupBam
+        path "${name}.picstats"
 
     script:
     """
     mkdir -p ${batch}_7-noDuplicates/${name}
-    java -jar ~/Softwares/picard/build/libs/picard.jar MarkDuplicates \\
+    java -jar /usr/picard/picard.jar MarkDuplicates \\
         --INPUT ${validateBam} \\
-        --OUTPUT ${batch}_7-noDuplicates/${name}/${name}.bam \\
+        --OUTPUT ${name}.bam \\
         --REMOVE_DUPLICATES \\
-        --METRICS_FILE ${batch}_7-noDuplicates/${name}/${name}.picstats 
-    samtools sort -O BAM \\
-        -o ${batch}_7-noDuplicates/${name}/${name}.sort.bam \\
-        ${batch}_7-noDuplicates/${name}/${name}.bam
-    rm ${batch}_7-noDuplicates/${name}/${name}.bam
+        --METRICS_FILE ${name}.picstats 
     """
 }

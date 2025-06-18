@@ -6,7 +6,6 @@
 */
 
 process reportRawFastqc {
-    
     input:
         tuple val (name), path (r1), path (r2)
         val batch
@@ -24,7 +23,6 @@ process reportRawFastqc {
 }
 
 process reportTrimFastqc {
-    
     input:
         tuple val (name), path (r1), path (r2)
         val batch

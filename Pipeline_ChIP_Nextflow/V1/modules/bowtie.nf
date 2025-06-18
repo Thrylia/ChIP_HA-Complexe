@@ -2,7 +2,7 @@
 
 
 /*
-    Run bowtie2 on the trim-illumina.fastq.gz
+    Run bowtie2 on the trim-illumina.fastq
 */
 
 process bowtieIndex {
@@ -24,7 +24,6 @@ process bowtieIndex {
 
 
 process bowtieAlign {
-    
     input: 
         tuple val (name), path (r1), path (r2)
         path bowtieIndexDir

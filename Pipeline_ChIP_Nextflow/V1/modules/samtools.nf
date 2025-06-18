@@ -6,7 +6,6 @@
 */
 
 process samtoolsFilter {
-
     input:
         tuple val (name), path (rawSam)
         val batch
@@ -30,10 +29,44 @@ process samtoolsFilter {
     """
 }
 
+process samtoolsSort {
+    publishDir "results/${batch}_7-noDuplicates/${name}", mode: 'copy'
+    
+    input:
+        tuple val (name), path (bamUnsorted)
+        val batch
 
-process samtoolsSubset {
-    publishDir 'results', mode 'copy'
+    output:
+        tuple val (name), path ("${name}.sort.bam"), emit: noDupSortBam
 
+    script:
+    """
+    samtools sort -O BAM \\
+        -o ${name}.sort.bam \\
+        ${bamUnsorted}
+    rm ${bamUnsorted}
+    """
+}
+
+process samtoolsSortWhite {    
+    input:
+        tuple val (name), path (bamUnsorted)
+        val batch
+
+    output:
+        tuple val (name), path ("${batch}_8-noBlackListedRegions/${name}/${name}.sort.bam"), emit: whiteSortBam
+
+    script:
+    """
+    mkdir -p ${batch}_8-noBlackListedRegions/${name}
+    samtools sort -O BAM \\
+        -o ${batch}_8-noBlackListedRegions/${name}/${name}.sort.bam \\
+        ${bamUnsorted}
+    rm ${bamUnsorted}
+    """
+}
+
+process samtoolsSubset { 
     input:
         path filteredBamDir
         val batch
@@ -56,6 +89,3 @@ process samtoolsSubset {
         \$sample_name.bam
     """
 }
-
-
-

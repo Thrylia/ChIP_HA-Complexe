@@ -11,7 +11,7 @@ process bedtoolsBlackListed {
         val batch
 
     output:
-        tuple val (name), path ("${batch}_8-noBlackListedRegions/${name}/${name}.sort.bam"), emit: bamWhite
+        tuple val (name), path ("${batch}_8-noBlackListedRegions/${name}/${name}.bam"), emit: bamWhite
 
     script:
     """
@@ -22,12 +22,5 @@ process bedtoolsBlackListed {
         -v \\
         -sorted \\
         > ${batch}_8-noBlackListedRegions/${name}/${name}.bam
-    samtools sort \\
-        -O BAM \\
-        -o ${batch}_8-noBlackListedRegions/${name}/${name}.sort.bam \\
-        ${batch}_8-noBlackListedRegions/${name}/${name}.bam
     """
 }
-
-
-
